@@ -1,0 +1,9 @@
+Flask
+Flask-CORS
+opencv-python
+yt-dlp
+moviepy
+Werkzeug
+ffmpeg-python
+azure-storage-blob
+python-dotenv
