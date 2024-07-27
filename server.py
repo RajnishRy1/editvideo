@@ -11,11 +11,11 @@ from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 from dotenv import load_dotenv
 load_dotenv()
 
-STORAGE_CONNECTION_STRING = os.getenv("STORAGE_CONNECTION_STRING")
-CONTAINER_NAME = os.getenv('CONTAINER_NAME')
+# STORAGE_CONNECTION_STRING = os.getenv("STORAGE_CONNECTION_STRING")
+# CONTAINER_NAME = os.getenv('CONTAINER_NAME')
 
-blob_service_client = BlobServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
-container_client = blob_service_client.get_container_client(CONTAINER_NAME)
+# blob_service_client = BlobServiceClient.from_connection_string(STORAGE_CONNECTION_STRING)
+# container_client = blob_service_client.get_container_client(CONTAINER_NAME)
 
 app = Flask(__name__)
 CORS(app)
@@ -26,7 +26,10 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['TRIMMED_FOLDER'], exist_ok=True)
 os.makedirs(app.config['DOWNLOAD_FOLDER'],exist_ok=True)
 
-
+downloadedVideo = 'output.mp4'
+trimmedVideo = 'trimmed.mp4'
+croppedVideo = 'cropped.mp4'
+finalVideo = 'final.mp4'
 
 
 def combine_video_and_audio():
@@ -40,7 +43,7 @@ def combine_video_and_audio():
 
         video_file_path = os.path.join(app.config['DOWNLOAD_FOLDER'], video_file)
         audio_file_path = os.path.join(app.config['DOWNLOAD_FOLDER'], audio_file)
-        output_file = os.path.join(app.config['DOWNLOAD_FOLDER'], "output.mp4")
+        output_file = os.path.join(app.config['DOWNLOAD_FOLDER'], downloadedVideo)
 
         # ffmpeg command to combine video and audio
         command = [
@@ -63,33 +66,11 @@ def combine_video_and_audio():
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
-# def combine_video_and_audio():
-#     try:
-#         downloads_folder = ensure_downloads_folder_exists()
-#         video_file = next((file for file in os.listdir(app.config['DOWNLOAD_FOLDER']) if file.startswith('video')), None)
-#         audio_file = next((file for file in os.listdir(app.config['DOWNLOAD_FOLDER']) if file.startswith('audio')), None)
-
-#         if not video_file or not audio_file:
-#             print("Could not find video or audio file.")
-#             return
-
-#         video_clip = VideoFileClip(os.path.join(app.config['DOWNLOAD_FOLDER'], video_file))
-#         audio_clip = AudioFileClip(os.path.join(app.config['DOWNLOAD_FOLDER'], audio_file))
-
-#         output_file = os.path.join(app.config['DOWNLOAD_FOLDER'], "output.mp4")
-#         video_clip = video_clip.set_audio(audio_clip)
-#         video_clip.write_videofile(output_file, codec='libx264')
-
-#         print(f"Output file created: {output_file}")
-
-#     except Exception as e:
-#         print(f"An error occurred during combining: {e}")
-
 def download_video_and_audio(url):
     try:
         audio_path = os.path.join(app.config['DOWNLOAD_FOLDER'],'audio.webm')
         video_path = os.path.join(app.config['DOWNLOAD_FOLDER'],'video.mp4')
-        output_path= os.path.join(app.config['DOWNLOAD_FOLDER'],'output.mp4')
+        output_path= os.path.join(app.config['DOWNLOAD_FOLDER'],downloadedVideo)
 
         if(os.path.exists(video_path)):
             os.remove(video_path)
@@ -121,53 +102,6 @@ def download_video_and_audio(url):
 
     except Exception as e:
         print(f"An error occurred during download: {e}")
-def crop_center_square(frame):
-    height, width, _ = frame.shape
-    min_dimension = min(width, height)
-    
-    start_x = (width - min_dimension) // 2
-    start_y = (height - min_dimension) // 2
-    
-    cropped_frame = frame[start_y:start_y + min_dimension, start_x:start_x + min_dimension]
-    return cropped_frame
-def crop_video_to_square(input_path, output_path):
-    cap = cv2.VideoCapture(input_path)
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    fps = int(cap.get(cv2.CAP_PROP_FPS))
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    min_dimension = min(width, height)
-
-    out = cv2.VideoWriter(output_path, fourcc, fps, (min_dimension, min_dimension))
-
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-        cropped_frame = crop_center_square(frame)
-        out.write(cropped_frame)
-
-    cap.release()
-    out.release()
-def merge_videos_ffmpeg(video1_path, video2_path, output_path):
-    temp_video2_path = os.path.join(app.config['UPLOAD_FOLDER'] ,"temp_cropped_video.mp4")
-    crop_video_to_square(video2_path, temp_video2_path) #trimmed_output.MP4, temp_cropped_video.mp4
-
-    ffmpeg_command = [
-        'ffmpeg',
-        '-i', video1_path,
-        '-i', temp_video2_path,
-        '-filter_complex', '[0:v]scale=1080:-1,pad=1080:1920:0:0[bg];[1:v]scale=1080:-1[fg];[bg][fg]overlay=0:H/2',
-        '-c:a', 'copy',
-        '-c:v', 'libx264',
-        '-preset', 'fast',
-        '-crf', '18',
-        '-t', '00:01:00',
-        output_path
-    ]
-
-    subprocess.run(ffmpeg_command)
-    os.remove(temp_video2_path)
 
 def crop_center_square(frame):
     height, width, _ = frame.shape
@@ -202,7 +136,7 @@ def crop_video_to_square(input_path, output_path):
 def merge_videos_ffmpeg(video1_path, video2_path, output_path):
     temp_video2_path = "temp_cropped_video.mp4"
     crop_video_to_square(video2_path, temp_video2_path)
-    combined_path = os.path.join(app.config['DOWNLOAD_FOLDER'], 'combined_video.mp4')
+    combined_path = os.path.join(app.config['DOWNLOAD_FOLDER'], finalVideo)
     if os.path.exists(combined_path):
         os.remove(combined_path)
         
@@ -249,9 +183,9 @@ def download_merged(filename):
 
 @app.route('/merge', methods=['POST'])
 def merge_videos():
-    video1_path = os.path.join(app.config['UPLOAD_FOLDER'], 'output_cropped.mp4')
-    video2_path = os.path.join(app.config['TRIMMED_FOLDER'], 'trimmed_output.mp4')
-    output_path = os.path.join(app.config['DOWNLOAD_FOLDER'], 'combined_video.mp4')
+    video1_path = os.path.join(app.config['UPLOAD_FOLDER'], croppedVideo)
+    video2_path = os.path.join(app.config['TRIMMED_FOLDER'], trimmedVideo)
+    output_path = os.path.join(app.config['DOWNLOAD_FOLDER'], finalVideo)
     merge_videos_ffmpeg(video1_path, video2_path, output_path)
     return jsonify({"message": "videos merged successfully"}), 200
 
@@ -318,7 +252,7 @@ def crop_video():
     if not os.path.exists(input_path):
         return jsonify({'error': 'File not found'}), 404
 
-    output_path = os.path.join(app.config['UPLOAD_FOLDER'], 'output_cropped.mp4')
+    output_path = os.path.join(app.config['UPLOAD_FOLDER'], croppedVideo)
 
     try:
         # Use ffmpeg to crop the video and retain audio
@@ -348,13 +282,13 @@ def upload_file():
 @app.route('/trim', methods=['POST'])
 def trim_video():
     data = request.json
-    filepath = os.path.join(app.config['DOWNLOAD_FOLDER'], 'output.mp4')
+    filepath = os.path.join(app.config['DOWNLOAD_FOLDER'], downloadedVideo)
     start_time = data.get('start_time')
     end_time = data.get('end_time')
     if not filepath or not start_time or not end_time:
         return jsonify({"error": "Missing data"}), 400
     filename = os.path.basename(filepath)
-    trimmed_path = os.path.join(app.config['TRIMMED_FOLDER'], f'trimmed_{filename}')
+    trimmed_path = os.path.join(app.config['TRIMMED_FOLDER'], trimmedVideo)
     # Check if the trimmed file already exists and remove it
     if os.path.exists(trimmed_path):
         os.remove(trimmed_path)
@@ -364,7 +298,7 @@ def trim_video():
         .output(trimmed_path, codec='copy')
         .run(overwrite_output=True)
     )
-    return jsonify({"trimmed_path": f'trimmed_{filename}'}), 200
+    return jsonify({"trimmed_path":trimmedVideo}), 200
 
 @app.route('/trimmed/<filename>', methods=['GET'])
 def get_trimmed_video(filename):
