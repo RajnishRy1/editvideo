@@ -142,7 +142,7 @@ def merge_videos_ffmpeg(video1_path, video2_path, output_path):
     if os.path.exists(combined_path):
         os.remove(combined_path)
     
-    process_videos(video1_path=video1_path,temp_video2_path=temp_video2_path)
+    process_videos(video1_path=video1_path,temp_video2_path=temp_video2_path,output_path=output_path)
     # ffmpeg_command = [
     #     'ffmpeg',
     #     '-i', video1_path,
