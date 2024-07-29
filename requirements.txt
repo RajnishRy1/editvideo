@@ -7,3 +7,4 @@ Werkzeug
 ffmpeg-python
 azure-storage-blob
 python-dotenv
+imageio[ffmpeg]
