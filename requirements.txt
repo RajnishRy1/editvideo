@@ -1,6 +1,7 @@
 Flask
 Flask-CORS
 opencv-python
+ffmpy
 ffmpeg-python
 yt-dlp
 moviepy>=1.0.3
