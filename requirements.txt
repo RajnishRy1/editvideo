@@ -3,7 +3,6 @@ Flask-CORS
 opencv-python
 yt-dlp
 ffmpeg-python
-moviepy==1.0.3
 Werkzeug
 azure-storage-blob
 python-dotenv
