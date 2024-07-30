@@ -3,7 +3,6 @@ from flask_cors import CORS
 import os
 import cv2
 import yt_dlp
-from moviepy.editor import VideoFileClip, AudioFileClip
 from werkzeug.utils import secure_filename
 import ffmpeg
 import subprocess
