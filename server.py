@@ -175,6 +175,10 @@ def merge_videos_ffmpeg(video1_path, video2_path, output_path):
     subprocess.run(ffmpeg_command)
     os.remove(temp_video2_path)
 
+@app.route("/") 
+def index(): 
+    return "Video Edit Backend"
+
 @app.route('/downloadmerged/<filename>')
 def download_merged(filename):
     filepath = os.path.join(app.config['DOWNLOAD_FOLDER'], filename)
