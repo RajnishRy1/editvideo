@@ -114,24 +114,32 @@ def crop_center_square(frame):
     return cropped_frame
 
 def crop_video_to_square(input_path, output_path):
-    cap = cv2.VideoCapture(input_path)
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    fps = int(cap.get(cv2.CAP_PROP_FPS))
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    min_dimension = min(width, height)
+    command = [
+        'ffmpeg', '-i', input_path,
+        '-vf', 'crop=min(in_w\\,in_h):min(in_w\\,in_h):(in_w-min(in_w\\,in_h))/2:(in_h-min(in_w\\,in_h))/2',
+        output_path
+    ]
+    subprocess.run(command, check=True)
+    
+# def crop_video_to_square(input_path, output_path):
+#     cap = cv2.VideoCapture(input_path)
+#     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+#     fps = int(cap.get(cv2.CAP_PROP_FPS))
+#     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+#     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+#     min_dimension = min(width, height)
 
-    out = cv2.VideoWriter(output_path, fourcc, fps, (min_dimension, min_dimension))
+#     out = cv2.VideoWriter(output_path, fourcc, fps, (min_dimension, min_dimension))
 
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-        cropped_frame = crop_center_square(frame)
-        out.write(cropped_frame)
+#     while True:
+#         ret, frame = cap.read()
+#         if not ret:
+#             break
+#         cropped_frame = crop_center_square(frame)
+#         out.write(cropped_frame)
 
-    cap.release()
-    out.release()
+#     cap.release()
+#     out.release()
 
 def merge_videos_ffmpeg(video1_path, video2_path, output_path):
     temp_video2_path = "temp_cropped_video.mp4"
