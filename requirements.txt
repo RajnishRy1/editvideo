@@ -2,6 +2,7 @@ Flask
 Flask-CORS
 opencv-python
 yt-dlp
+ffmpeg
 ffmpeg-python
 Werkzeug
 azure-storage-blob
