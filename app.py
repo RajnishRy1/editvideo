@@ -115,12 +115,13 @@ def crop_center_square(frame):
 
 def crop_video_to_square(input_path, output_path):
     command = [
-        'ffmpeg', '-i', input_path,
+        'ffmpeg', '-y',
+        '-i', input_path,
         '-vf', 'crop=min(in_w\\,in_h):min(in_w\\,in_h):(in_w-min(in_w\\,in_h))/2:(in_h-min(in_w\\,in_h))/2',
         output_path
     ]
     subprocess.run(command, check=True)
-    
+
 # def crop_video_to_square(input_path, output_path):
 #     cap = cv2.VideoCapture(input_path)
 #     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
