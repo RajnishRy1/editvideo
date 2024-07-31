@@ -1,7 +1,6 @@
 #!/bin/bash
 # Update package lists and install required libraries
 apt-get update
-apt-get install -y libgl1-mesa-glx libglib2.0-0
 apt-get install -y ffmpeg
 
 # Run Gunicorn to start your Flask application
