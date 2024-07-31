@@ -46,7 +46,7 @@ def combine_video_and_audio():
 
         # ffmpeg command to combine video and audio
         command = [
-            'ffmpeg',
+            'ffmpeg', '-y',
             '-i', video_file_path,
             '-i', audio_file_path,
             '-c:v', 'copy',
@@ -142,7 +142,7 @@ def merge_videos_ffmpeg(video1_path, video2_path, output_path):
     # ]
 
     ffmpeg_command = [
-        'ffmpeg',
+        'ffmpeg', '-y',
         '-i', video1_path,
         '-i', temp_video2_path,
         '-filter_complex', (
