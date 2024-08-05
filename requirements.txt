@@ -1,10 +1,7 @@
 Flask
 Flask-CORS
-opencv-python
 yt-dlp
 ffmpeg-python
 Werkzeug
 azure-storage-blob
 python-dotenv
-imageio
-imageio-ffmpeg
