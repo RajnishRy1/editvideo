@@ -67,21 +67,31 @@ def combine_video_and_audio():
 
 def download_video_and_audio(url):
     try:
-        audio_path = os.path.join(app.config['DOWNLOAD_FOLDER'],'audio.webm')
-        video_path = os.path.join(app.config['DOWNLOAD_FOLDER'],'video.mp4')
-        output_path= os.path.join(app.config['DOWNLOAD_FOLDER'],downloadedVideo)
+        # audio_path = os.path.join(app.config['DOWNLOAD_FOLDER'],'audio.webm')
+        # video_path = os.path.join(app.config['DOWNLOAD_FOLDER'],'video.mp4')
+        # output_path= os.path.join(app.config['DOWNLOAD_FOLDER'],downloadedVideo)
 
-        if(os.path.exists(video_path)):
-            os.remove(video_path)
+        for filename in os.listdir(app.config['DOWNLOAD_FOLDER']):
+            file_path = os.path.join(app.config[
+            'DOWNLOAD_FOLDER'
+            ], filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
 
-        if(os.path.exists(audio_path)):
-            os.remove(audio_path)
+        # if(os.path.exists(video_path)):
+        #     print('Removing Existing Video')
+        #     os.remove(video_path)
 
-        if(os.path.exists(output_path)):
-            os.remove(output_path)
+        # if(os.path.exists(audio_path)):
+        #     print('Removing Existing Audio')            
+        #     os.remove(audio_path)
+
+        # if(os.path.exists(output_path)):
+        #     print('Removing Existing Final Output')            
+        #     os.remove(output_path)
 
         ydl_opts_video = {
-            'format': 'bestvideo[height>=1080]/best',
+            'format': 'bestvideo/best',
             'outtmpl': os.path.join(app.config['DOWNLOAD_FOLDER'], 'video.%(ext)s'),
             'noplaylist': True,
         }
